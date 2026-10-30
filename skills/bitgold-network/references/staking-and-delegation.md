@@ -24,6 +24,8 @@ Mainnet chain ID `618` (`0x26A`), testnet `617` (`0x269`), coin `Bitgold (BTG)` 
 
 Roles are recomputed every 24 hours from the latest staking information; after UTC 00:00 the consensus engine sorts validators and updates the set.
 
+K = 21 and the `(21, 45]` candidate band are the **documented protocol design**, not the current headcount: the live mainnet consensus set held 6 validators on 2026-10-30 (`parlia_getSnapshot`). Read the current set before quoting a size - see [./validators.md](./validators.md).
+
 ### System contracts
 
 | Contract | Role (as documented) |
@@ -33,7 +35,7 @@ Roles are recomputed every 24 hours from the latest staking information; after U
 | Slash Contract | Tracks unavailability and triggers penalties at a threshold; also handles double signing and malicious fast-finality voting |
 | Stake Hub `0x0000000000000000000000000000000000002002` | Entry point for validator and delegation management; executes slashing, and forwards delegate/undelegate/redelegate to the validator's implementation contract |
 
-### Credit contracts (stBTG)
+### Credit contracts (`st{{moniker}}`)
 
 Each validator gets a credit contract, deployed by `StakeHub` at creation. It is ERC-20 compatible, cannot be upgraded or replaced by the operator, and holds that validator's staked BTG plus accrued rewards. Delegating BTG mints credit; undelegating burns credit and releases BTG.
 
@@ -66,7 +68,7 @@ Documented example: 100 stCredit against a 10,000 BTG / 10,000 supply pool is 10
 | Validator minimum self-delegation | 2000 BTG | Required to become a validator |
 | Validator creation lock | 1 BTG | Locked in addition to self-delegation |
 | Total value on `createValidator` | 2001 BTG | "lock amount plus any self-delegation, in total 2001 BTG" |
-| Redelegation fee | 0.002% | Charged to discourage frequent switching |
+| Redelegation fee | 0.002% | Charged to discourage frequent switching; read the live value from `StakeHub` before quoting it to a user |
 | Unbonding period | 7 days ("currently 7 days") | Before undelegated stake can be claimed |
 | Reward distribution | Daily, 00:00:00 UTC | Commission to operator, remainder to pool |
 | Validator set refresh | Every 24 h, after UTC 00:00 | Cabinet K = 21, candidates `(21, 45]` |

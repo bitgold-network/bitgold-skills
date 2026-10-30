@@ -6,16 +6,19 @@ Validator slashing rules, the slash monitor, and the proposer-builder (PBS) MEV 
 
 ## Slashing
 
-Slashing is a component of on-chain governance that penalizes malicious or negative validator actions. Anyone may submit a slash transaction, and the submitter pays the transaction fee and supplies the evidence; successful submissions pay a reward that the docs describe as larger than the cost of submitting.
+Slashing is a component of on-chain governance that penalizes malicious or negative validator actions. Anyone may submit a slash transaction, and the submitter pays the transaction fee and supplies the evidence; the docs state that reporting is rewarded so the reporter is not out of pocket.
 
 | Offence (docs' term) | Evidence rules and detection window | Documented penalty | Removed from set |
 |---|---|---|---|
-| **Double Sign** | Two block headers with the same height and the same parent block hash, sealed by the same validator, with two different signatures. Evidence is valid only within **24 hours** of the two blocks. | **200 BTG** slashed from the validator's **self-delegated** BTG; remaining slashed BTG goes to the credit addresses of validators in the next distribution; validator set to `jailed` for **30 days**. | Yes: removed from the active validator set immediately |
+| **Double Sign** | Two block headers with the same height and the same parent block hash, sealed by the same validator, with two different signatures. Evidence is valid only within **24 hours** of the two blocks. | **200 BTG** slashed from the validator's **self-delegated** BTG; the submitter's evidence reward (5 BTG on the validator-overview page) comes out of the slashed amount, the remainder goes to the credit addresses of validators in the next distribution; validator set to `jailed` for **30 days**. | Yes: removed from the active validator set immediately |
 | **Malicious Vote** (docs also use "Malicious Fast Finality Vote") | Two conflicting fast-finality votes: target number lags the canonical chain head by no more than **256** blocks; each source number is below its target; source and target hashes differ; target numbers are equal or one vote's span contains the other's; both votes signed by the same voting key with valid signatures; that key must be in the list sent by the last two breathe blocks. | **200 BTG** slashed from **self-delegated** BTG; **5 BTG** to the submitter from the system reward contract if the validator is active at submission time; remaining slashed BTG to validators' credit addresses; `jailed` for **30 days**. | Yes: removed from the active validator set immediately |
 | **Unavailability**, reward-loss tier | Missed-block metrics recorded by an internal smart contract; more than **333** missed blocks (governable) in **24 hours**. | Block reward withheld from the validator and shared among better-performing validators. | No |
 | **Unavailability**, jailing tier | More than **1000** missed blocks (governable) in **24 hours**. | **10 BTG** (governable) slashed from **self-delegated** BTG, allocated to validators' credit addresses; `jailed` for **2 days**. | Yes: removed from rotation |
+| **Low self-delegation** | Validator's self-delegated stake drops below the 2000 BTG minimum. | Slash per the validator-overview page; `jailed` for **2 days**. | Yes: removed from rotation |
 
-Two documented views of the same unavailability signal appear in the docs: the slash-rules page counts missed blocks (333 / 1000 per 24 hours), while the monitor page tracks a contract-side "slash indicator" value (attention above 50, slash above 200, jail above 600). Treat the on-chain contract state and the slash-rules page as authoritative if they appear to disagree.
+Several thresholds in this table are marked *governable*, meaning on-chain governance can change them - read the contract rather than trusting the number.
+
+**Where the two unavailability tables disagree.** The slash-rules page counts missed blocks (**333 / 1000** per 24 hours), the monitor page tracks a contract-side "slash indicator" (**attention above 50, slash above 200, jail above 600**), and the validator overview page states yet another pair (**50** missed blocks for reward loss, **150** for a downtime slash). These are three documented views of one signal, not three independent checks. The contract state and the slash-rules page are the authoritative pair; the other two are operator-facing indicators.
 
 ## How slashing is applied on chain
 
@@ -30,11 +33,11 @@ Two documented views of the same unavailability signal appear in the docs: the s
 
 ## Slash monitor
 
-The docs frame the monitor as a browser workflow on the Bitgold scanner, not as a CLI tool: keep watching the slash contract's event log at `https://www.bitgold.live` and read your validator's slash indicator from that contract.
+The docs frame the monitor as a browser workflow on the Bitgold block explorer, not as a CLI tool: keep watching the slash contract's event log at `https://www.bitgold.live` and read your validator's slash indicator from that contract.
 
 ```text
-Monitor target      : event log of the slash contract on the Bitgold scanner
-Scanner             : https://www.bitgold.live
+Monitor target      : event log of the slash contract on the Bitgold explorer
+Explorer            : https://www.bitgold.live
 Indicator > 50      : pay attention
 Indicator > 200     : validator will be slashed
 Indicator > 600     : validator will be jailed
@@ -43,7 +46,7 @@ Mainnet staking dApp: https://app.bitgold.network/staking
 Testnet             : switch the Bitgold app to Bitgold Testnet (chain ID 617)
 ```
 
-The monitor page publishes no shell commands, so no CLI is quoted here. Anything scripted around the slash contract is local tooling you own, and the contract address must be read from the scanner rather than copied from an unofficial source.
+The monitor page publishes no shell commands, so no CLI is quoted here. Anything scripted around the slash contract is local tooling you own, and the contract address must be read from the explorer rather than copied from an unofficial source.
 
 Operational reading of the page:
 

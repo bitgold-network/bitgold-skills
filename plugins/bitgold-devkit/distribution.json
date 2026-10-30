@@ -11,27 +11,27 @@
   },
   "payload": {
     "root": "skills/bitgold-network",
-    "sha256": "304cee8a2167a062e9e59ae15b1d00455e5513b887ce35d330b2483cb7d1e2bc",
+    "sha256": "83729313af6011e1a998b9466941dec7e496ceac64f707fe238c8f77c595f892",
     "files": [
       {
         "path": "SKILL.md",
-        "sha256": "19f5d09b0ccbcb6e106f4a47bab9796f0df476a37331408dc81607929b208c7d"
+        "sha256": "728f5cf788d0af0e1f47e0f13c65083d0a7f04dc190f9b0e19b02751c6601b77"
       },
       {
         "path": "references/account-abstraction-and-bridge.md",
-        "sha256": "56f4cac95ecad0177754d4ec63c872d7d503e4a2194ab83c7b86f6530a9fee3b"
+        "sha256": "895154dc3b652778178bc7def5ef1311be011742be1dc80d15ef3285fa74098b"
       },
       {
         "path": "references/evm-development.md",
-        "sha256": "53bbbf31cb01b5423133b4b71b2449f535078292a72a694850d7b3abf3f9ad8f"
+        "sha256": "7f583aa75c7530f5891cc1b81ca9dc31ad6267cd7a3f89114bfe8eca7e425914"
       },
       {
         "path": "references/governance.md",
-        "sha256": "9e8cc0a64150c2a9ceb24498204363dd9184a73cea29c8c01b33631952dbb4db"
+        "sha256": "71da0b20851f80bc135f9a82b2cb336eee49f12773195485a046575d7cd313bf"
       },
       {
         "path": "references/json-rpc.md",
-        "sha256": "bf2cc779b57e70cbdd8376f8b3c379a9e2ba43ce7b86b05b04eef973aeec237f"
+        "sha256": "4efa54001240d60249b4023372ca1454bee1d5f577e12b161b3ccde9432359c6"
       },
       {
         "path": "references/network-and-rpc.md",
@@ -39,23 +39,23 @@
       },
       {
         "path": "references/node-operations.md",
-        "sha256": "b7b91346c14a1ed1f27ce8174193eaf0720125692f7d77ee435f57cfb899b29c"
+        "sha256": "b6b9ef892babad0e3941af30f020c4dec6a177ef1dd42fa72a9d2fe9dcd36cfc"
       },
       {
         "path": "references/slashing-and-mev.md",
-        "sha256": "dfb73fe84d691d8851cac9406c9879b9686d9133fe28f03f781bdbb683f85c57"
+        "sha256": "6ea6631c6c7530c61ef44ba872776cd389bf279fe33b5d796fa8faaf4997fd09"
       },
       {
         "path": "references/staking-and-delegation.md",
-        "sha256": "dc9132731abbe0057e8c92c63ecf88ae5603971f1201cae24ba4c71eb162cc6c"
+        "sha256": "e23722a75c096998fb871e8d43cc389f3c3c5c33ce64c0c73663ca6ddbb629af"
       },
       {
         "path": "references/validators.md",
-        "sha256": "89d0e13968fa75fa6408ba994484f6d1fd5a918c6167a9f73d36570fbdc38801"
+        "sha256": "cbc812f255bab6b799fba49df89a76528ba5d4bc48e66209a7e7ba49854c9d76"
       },
       {
         "path": "references/wallets-and-faucet.md",
-        "sha256": "5f0dbbc2b6b24d9807955fe03245aa896ed75750b31abedcd23ceb543d7c5cfe"
+        "sha256": "165de55981e7fd6d2850a9e2fec3f9b39c48dcb54be5c08128c9da62cce8829b"
       }
     ]
   },

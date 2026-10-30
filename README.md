@@ -22,6 +22,8 @@ Bitgold is EVM-equivalent, so there is **nothing Bitgold-specific to install** �
 | Explorer | [www.bitgold.live](https://www.bitgold.live) | [testnet.bitgold.live](https://testnet.bitgold.live) |
 | Faucet | — | [faucet.bitgold.network](https://faucet.bitgold.network) |
 
+`mainnet1`–`mainnet5`, `mainnet-jp`, `mainnet-sg` and `testnet1` answered `eth_chainId` when last checked. `mainnet6`, `testnet2` and `testnet3` are published in the docs but did not resolve in DNS at that time — use `rpc.bitgold.network` and `testnet1.bitgold.network` as primaries and keep a fallback list.
+
 ## Marketplace plugin
 
 | Plugin | Description |
@@ -164,7 +166,9 @@ node scripts/check-repo.mjs            # JSON validity, SKILL.md frontmatter, li
 
 The build script copies the skill, recomputes the per-file and payload SHA-256 values in `plugins/bitgold-devkit/distribution.json`, and `--check` fails if the two trees drift. Native plugin clients do not verify `distribution.json`; it exists so a reviewer can confirm the published plugin matches the reviewed skill source.
 
-`check-repo.mjs` also enforces the rule this repository exists for: no branding, endpoints, or product names from the upstream ecosystem this project was adapted from survive anywhere in the content. CI runs both scripts on every push and pull request.
+`check-repo.mjs` also enforces the rule this repository exists for: no branding, endpoints, or product names from the upstream ecosystem this project was adapted from survive anywhere in the content. It is deliberately offline — it never fetches a URL — so CI stays deterministic; the link and host checks in this README were done by hand against the live network. CI runs both scripts on every push and pull request.
+
+`.gitattributes` forces LF everywhere. Without it, a Windows checkout writes CRLF and every payload hash in `distribution.json` changes, which would make the CI drift check fail on a checkout that is actually correct.
 
 ## References
 

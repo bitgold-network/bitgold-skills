@@ -24,7 +24,9 @@ Because the chain is EVM-equivalent, **no Bitgold-specific SDK is required**. Ev
 | Faucet | — | `https://faucet.bitgold.network` |
 | Staking / validators | `https://app.bitgold.network/staking/validators` | — |
 
-Latest block gas limit is `7,000,000,000`, block time is about one second, and `baseFeePerGas` is `0x0` on every block — the fee market is **legacy (type-0)**, not EIP-1559. Full parameter detail lives in [references/network-and-rpc.md](references/network-and-rpc.md).
+`mainnet6`, `testnet2` and `testnet3` are published in the docs but did not resolve in DNS when last checked — use `rpc.bitgold.network` and `testnet1.bitgold.network` as primaries.
+
+Block gas limit is `7,000,000,000`, block time is about one second, and `baseFeePerGas` is `0x0` on every block. EIP-1559 is enabled but neutralised: the base fee is pinned at zero, nothing is burned, and the whole fee reaches the validator — so send **legacy type-0 transactions with an explicit `gasPrice`**. Full parameter detail lives in [references/network-and-rpc.md](references/network-and-rpc.md).
 
 ## Before you act
 
@@ -57,7 +59,7 @@ If two rows match, read both — they are written to be orthogonal.
 
 1. **Confirm the network before every write.** Testnet is `0x269`; mainnet is `0x26a`. Do not silently pick one.
 2. **Send legacy transactions.** With `baseFeePerGas` at `0x0`, set an explicit `gasPrice` (about 5 gwei at time of writing). Do not build EIP-1559 `maxFeePerGas` logic on top of `eth_feeHistory` — it reports zero base fees.
-3. **Use documented endpoints only.** The hosts in [references/network-and-rpc.md](references/network-and-rpc.md) are the complete list. Do not fabricate a `wss://` endpoint or a regional host name.
+3. **Use documented endpoints only.** The hosts in [references/network-and-rpc.md](references/network-and-rpc.md) are the complete list. Do not invent a host name. The WebSocket form is `wss://<host>` with no path suffix; `mainnet6`, `testnet2` and `testnet3` currently do not resolve.
 4. **Keep Bitgold Network and Bitgold Next apart.** *Bitgold Next* is a separate in-development devnet documented at `docs.bitgold.network/bitgold-next/`. It is not mainnet and not testnet; never point production or tutorial configs at it.
 5. **Amounts are wei at the RPC boundary.** BTG has 18 decimals; parse and format with `parseEther` / `formatEther` rather than string math.
 6. **Cite what you read.** When you state a fee, penalty, minimum stake, or governance threshold, say where it came from — an on-chain call or a docs page. Never present a recalled number as current.

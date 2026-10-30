@@ -122,9 +122,9 @@ async function main() {
       problems.push(`missing mirror directory: ${MIRROR_DIR}`);
     } else {
       const missing = files.filter((f) => !mirrorFiles.includes(f.path));
-      const extra = mirrorFiles.filter((f) => !sourceFiles.includes(f.path));
+      const extra = mirrorFiles.filter((f) => !sourceFiles.includes(f));
       for (const f of missing) problems.push(`missing in mirror: ${f.path}`);
-      for (const f of extra) problems.push(`extra in mirror: ${f.path}`);
+      for (const f of extra) problems.push(`extra in mirror: ${f}`);
       for (const f of files) {
         if (!mirrorFiles.includes(f.path)) continue;
         const mirrorHash = await sha256File(path.join(MIRROR_DIR, f.path));

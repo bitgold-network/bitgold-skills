@@ -4,7 +4,7 @@ Bitgold's **EOA-based Paymaster** is a gas sponsorship service for ordinary exte
 
 ## Concepts
 
-The terms below are the documentation's own. Bitgold is forked from the BSC v1.8.1 codebase, so it inherits a proposer-builder separation (PBS, called BEP322 in the docs) block pipeline in which validators no longer check per-transaction gas prices inside a block. That is what makes a zero-gas-price transaction includable at all: builders package bundles into block proposals, and proposers select the most profitable proposal.
+The terms below are the documentation's own. Bitgold is forked from the BSC v1.8.1 codebase, so it inherits a proposer-builder separation (PBS) block pipeline in which validators no longer check per-transaction gas prices inside a block. That is what makes a zero-gas-price transaction includable at all: builders package bundles into block proposals, and proposers select the most profitable proposal.
 
 | Concept | Meaning as documented |
 | --- | --- |
@@ -60,11 +60,11 @@ Follows the standard Ethereum JSON-RPC spec: `params` is a one-element array hol
 ```json
 {
   "jsonrpc": "2.0", "id": 1, "method": "eth_sendRawTransaction",
-  "params": ["0x02f86a6102850df8475800850df84758000a94cd9c02358c223a3e788c0b9d94b98d434c7aa0f18080c080a0bcb0e8ffa344e4b855c6e13ee9e4e5d22cff6ad8bd1145a93b93c5d332100c2ca03765236eba5fbb357e35014fd19ba4b3c6b87f3793bd14dddf7913fc8dcc88bf"]
+  "params": ["0x<signed-transaction-hex>"]
 }
 ```
 
-That byte string is illustrative only: it is not a replayable Bitgold transaction, so do not copy it. It is also a typed (`0x02...`) envelope, whereas the sponsored transaction a wallet signs is a legacy type-0 transaction with an explicit gas price, because `baseFeePerGas` on Bitgold is `0x0` and the network expects type-0 transactions with an explicit `gasPrice` (around 5 gwei at the time of writing).
+Sign the transaction with the wallet's own key, with `gasPrice` set to `0x0` for the sponsored leg. Do not copy a raw transaction out of a tutorial: the envelope encodes the chain id, and a string signed for another chain is rejected (or worse, replayed nowhere useful). The supported shape on Bitgold is a legacy type-0 transaction with an explicit `gasPrice` - `baseFeePerGas` is `0x0`, so the sponsored leg carries zero and the paired sponsor transaction carries the real price (around 5 gwei at the time of writing, read it from `eth_gasPrice`).
 
 ### Errors, quoting, and status
 

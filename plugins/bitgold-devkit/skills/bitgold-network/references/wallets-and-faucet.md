@@ -91,7 +91,7 @@ Requirements and limits:
 | Verification | A challenge or check may be required per request; follow what the page shows |
 | Amount per request | Set by the faucet service, not published as a fixed number |
 | Cooldown | Per-address and per-IP limits are enforced by the service and can change without notice |
-| Larger test allocations | Request through the channels listed on `https://www.bitgold.network` |
+| Larger test allocations | Request through the project or team channels published on `https://www.bitgold.network` |
 
 Because the amounts and cooldowns are service-side and can change, do not hardcode an expected drip size in tests or documentation. Read the balance after the transaction confirms instead.
 

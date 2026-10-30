@@ -1,8 +1,10 @@
 # Governance
 
-Bitgold Network governance is an on-chain Governor plus Timelock system: proposals, votes and executions are all recorded on chain, and voting power comes from staked BTG (the governance token is referred to as `govBTG` in the parameter tables). The design follows the OpenZeppelin Governor model. Holders participate through the Bitgold app or any interface that supports the standard Governor ABI.
+Bitgold Network governance is an on-chain Governor plus Timelock system: proposals, votes and executions are all recorded on chain, and voting power comes from staked BTG (the docs refer to the governance token as `govBTG` in the parameter tables). The design follows the OpenZeppelin Governor model. Holders participate through the Bitgold app or any interface that supports the standard Governor ABI.
 
-Contracts: `Governor` at `0x0000000000000000000000000000000000002004`, `GovToken` at `0x0000000000000000000000000000000000002005`, on mainnet chain ID `618` (`0x26A`) and testnet `617` (`0x269`). `GovToken` manages the governance token, syncs balances with staked assets and carries delegation; `Governor` handles proposal creation, voting, queueing and execution. The UI is the governance area of <https://app.bitgold.network>.
+Contracts: `Governor` at `0x0000000000000000000000000000000000002004` and `GovToken` at `0x0000000000000000000000000000000000002005`, on mainnet chain ID `618` (`0x26A`) and testnet `617` (`0x269`). Both addresses hold deployed code on mainnet (confirmed with `eth_getCode` on 2026-10-30). `GovToken` manages the governance token, syncs balances with staked assets and carries delegation; `Governor` handles proposal creation, voting, queueing and execution. The UI is the governance area of <https://app.bitgold.network>.
+
+The `Governor` function signatures below come from the governance API page; the `GovToken` delegation signature is not printed there, so verify it against the deployed ABI before relying on it.
 
 > **Risk note:** governance parameters can change through governance itself; the values read from the `Governor` and `GovToken` contracts are authoritative.
 
@@ -35,7 +37,9 @@ Rules that shape participation:
 | `minPeriodAfterTheQuorum` | Extra voting time added on reaching quorum | 1 day | 1 hour |
 | `timelockDelay` | Timelock before a queued proposal executes | 1 day | 6 hours |
 
-The overview page restates the same mainnet values in prose: minimum stake of 200 BTG to propose, voting period 7 days, quorum 10%, tally threshold where `Yes` must be no less than `No` and reach 50%, timelock 1 day.
+The **mainnet** column is published on the governance overview page, which restates it in prose: 200 BTG minimum stake to propose, 7-day voting period, 10% quorum, a tally where `Yes` is no less than `No` and reaches 50%, and a 1-day timelock. The **testnet** column is not published on the cited pages; treat those four values as unconfirmed and read them from the testnet `Governor` before quoting them.
+
+`quorumNumberRator` is spelled as the docs print it; if a contract call reverts on that name, try the conventional `quorumNumerator` — the ABI is the authority, not the prose.
 
 The docs specify a **proposal threshold only**; no proposal deposit or bond is documented anywhere in these pages, so an agent must not state one. Treat any deposit figure as read-on-chain or ask the user.
 
@@ -49,7 +53,7 @@ Not documented, therefore left as read-on-chain: the numeric `ProposalState` ord
 4. **Choose For, Against, or Abstain**, then sign the transaction.
 5. **Queue** a successful proposal, and after the timelock **Execute** it — either step can be sent by anyone.
 
-Voting power is the staking credit amount held when the proposal is submitted, i.e. it is snapshotted at proposal creation. The advocate guide puts the operational consequence plainly: delegate before a proposal is created if you want your weight counted. The temperature-check page additionally lists raw BTG balance as a factor in governance power; the binding on-chain vote uses staked credit, so treat balance-based influence as applying to sentiment polls unless an on-chain read says otherwise.
+Voting power is the staking credit held at the point the proposal is submitted - the docs describe it as determined by the staking snapshot taken at proposal creation, though they do not publish the snapshot block number, so read it from the contract if you need the exact height. The advocate guide puts the operational consequence plainly: delegate before a proposal is created if you want your weight counted. The temperature-check page additionally lists raw BTG balance as a factor in governance power; the binding on-chain vote uses staked credit, so treat balance-based influence as applying to sentiment polls unless an on-chain read says otherwise.
 
 Timing at a glance: voting opens after `votingDelay` (0 hours today, so effectively immediately), stays open for `votingPeriod` (7 days mainnet, 1 day testnet), may extend by `minPeriodAfterTheQuorum` if quorum is reached late, then waits `timelockDelay` (1 day mainnet, 6 hours testnet) before execution.
 

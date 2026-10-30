@@ -84,7 +84,7 @@ Add `--history.logs.disable` for better performance, at the cost of slower `eth_
 
 ```bash
 ./geth --config ./config.toml --datadir <datadir> \
-  --cache 1024 --maxpeers 200 --nodiscover=false
+  --cache 1024 --maxpeers 200
 ```
 
 ### Adding an HTTP endpoint
@@ -150,10 +150,10 @@ docker run -v $(pwd)/config:/bitgold/config -v $(pwd)/data/node:/bitgold/node \
 | Blockchain data | `data/node` | `/bitgold/node` |
 | Config files | `config` | `/bitgold/config` |
 
-`BITGOLD_HOME=/bitgold`, `DATA_DIR=/data`; config is read from `${BITGOLD_HOME}/config/config.toml`, genesis from `${BITGOLD_HOME}/config/genesis.json`.
+`BITGOLD_HOME=/bitgold`, `DATA_DIR=/bitgold/node`; config is read from `${BITGOLD_HOME}/config/config.toml`, genesis from `${BITGOLD_HOME}/config/genesis.json`.
 
 - Port **8575** is the testnet RPC default; mainnet uses **8545** — adjust `-p` and `--http.port`. `--http.addr 0.0.0.0` is correct inside the container because the published port is the boundary; a host binary should bind `127.0.0.1`.
-- Checks: `geth attach http://localhost:8575`, `docker exec -it bitgold bash`, `geth attach ipc:node/geth.ipc > eth.syncing`, `tail -f node/geth.log`. Ubuntu host setup after install: `systemctl enable docker.service`, `systemctl enable containerd.service`, `usermod -aG docker ubuntu`.
+- Checks: `geth attach http://localhost:8575`, `docker exec -it bitgold bash`, `geth attach --exec 'eth.syncing' ipc:node/geth.ipc`, `tail -f node/geth.log`. Ubuntu host setup after install: `systemctl enable docker.service`, `systemctl enable containerd.service`, `usermod -aG docker ubuntu`.
 
 ## Snapshots and initial sync
 
@@ -181,12 +181,14 @@ The 30311/30303 discrepancy is real: the firewall section repeats geth defaults 
 
 ## Monitoring and maintenance
 
-Logs are written under the data directory. Watch the import line, where `mgasps` is the sync-speed metric — the docs expect roughly 100 and attribute persistent shortfalls to disk rather than network. Documented alert thresholds: tx pool above 5000 transactions, block import above 3 s, RPC latency above 100 ms.
+Logs are written under the data directory. Watch the import line: `mgas` is the gas imported by the segment and `elapsed` its wall time, so `mgas / elapsed` is the sync-speed metric the docs discuss (~100 mgasps expected; persistent shortfalls point at disk, not network). Documented alert thresholds: tx pool above 5000 transactions, block import above 3 s, RPC latency above 100 ms.
 
 ```bash
 tail -f <datadir>/geth.log
-# lvl=info msg="Imported new chain segment" blocks=1 txs=177 mgas=17.317 elapsed=31.131ms number=21,153,429 hash=0x42e6... dirty="0.00 B"
+# lvl=info msg="Imported new chain segment" blocks=1 txs=177 mgas=17.317 elapsed=31.131ms number=21153429 hash=0x42e6...
 ```
+
+The exact field set and formatting depend on your geth build — read the values from your own log line rather than matching this sample character for character.
 
 Health checks, from `geth attach ipc:<datadir>/geth.ipc`:
 
@@ -201,7 +203,7 @@ admin.nodeInfo.enode // your enode, for sentry or static-node wiring
 ### Disk growth
 
 - Archive mode keeps every historical state, and a full node degrades at high storage volume (1.5 TB was cited as an experimental threshold; the docs note the number needs updating). Alert well before capacity — a full disk halts the node — and keep storage light by pruning.
-- Prune state: stop the node, `nohup geth snapshot prune-state --datadir {datadir} &` (3–5 hours), then start it.
+- Prune state: stop the node, `nohup geth snapshot prune-state --datadir <datadir> &` (3–5 hours), then start it.
 - Prune ancient blocks: `./geth snapshot prune-block --datadir /server/node --datadir.ancient ./chaindata/ancient --block-amount-reserved 1024`. Related: `--pruneancient` keeps only the latest 90000 blocks of ancient data, one-way — once enabled, that data is unrecoverable and the node will not start without the flag. Keep spare nodes for pruning windows.
 
 ### Upgrade procedure

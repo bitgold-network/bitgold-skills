@@ -1,6 +1,6 @@
 # Bitgold Network — EVM Development
 
-Bitgold Network runs the EVM, so the Ethereum toolchain you already use deploys and calls contracts on chain 618 (mainnet) and chain 617 (testnet) without a porting project. This file is the copy-paste setup for Hardhat, Foundry, viem, ethers and Remix, plus the one behaviour that will bite you: the chain has no live EIP-1559 fee market, so transactions must carry an explicit legacy `gasPrice`. Every parameter and fee claim below was checked against the live chains on 2026-10-30.
+Bitgold Network runs the EVM, so the Ethereum toolchain you already use deploys and calls contracts on chain 618 (mainnet) and chain 617 (testnet) without a porting project. This file is the copy-paste setup for Hardhat, Foundry, viem, ethers and Remix, plus the one behaviour that will bite you: EIP-1559 is enabled with the base fee pinned at zero, so transactions should carry an explicit legacy `gasPrice` rather than 1559 fee fields. Every parameter and fee claim below was checked against the live chains on 2026-10-30.
 
 ## What works out of the box
 
@@ -55,8 +55,8 @@ Then `npx hardhat run scripts/deploy.ts --network bitgoldTestnet`. A `.js` confi
 
 Two Hardhat-specific warnings:
 
-- Do **not** rely on default fee logic. ethers' `sendTransaction` inside a Hardhat script populates EIP-1559 fields unless you pass `gasPrice` explicitly — set `gasPrice: 5_000_000_000n` so the transaction goes out as type 0.
-- Do **not** add an `etherscan` / `customChains` block for Bitgold yet. That block only works against an Etherscan-compatible verifier API, and the Bitgold docs do not document one. Both explorers are Blockscout deployments (their page titles say so), but `https://www.bitgold.live/api?module=stats&action=ethsupply` returns 404, so no Etherscan-compatible API is exposed at that path. Confirm verification options on the explorer before wiring up `hardhat-verify` or `forge verify-contract`; do not assume an endpoint and do not invent one.
+- Do **not** rely on default fee logic. ethers' `sendTransaction` inside a Hardhat script populates EIP-1559 fields unless you pass `gasPrice` explicitly — pass the value you read from `eth_gasPrice` (`gasPrice: 5_000_000_000n` is only today's reading) so the transaction goes out as type 0.
+- Do **not** add an `etherscan` / `customChains` block for Bitgold yet. That block only works against an Etherscan-compatible verifier API, and the Bitgold docs do not document one. Both explorers present a Blockscout-style interface and an Etherscan-compatible `?module=stats` API did not respond when probed on 2026-10-30. Confirm verification options on the explorer before wiring up `hardhat-verify` or `forge verify-contract`; do not assume an endpoint and do not invent one.
 
 ## Foundry
 
@@ -78,7 +78,7 @@ Deploy one contract, then run a script, then call it:
 
 ```bash
 forge create src/MyContract.sol:MyContract --rpc-url bitgold_testnet \
-  --private-key "$PRIVATE_KEY" --legacy --gas-price 5gwei --broadcast
+  --private-key "$PRIVATE_KEY" --legacy --gas-price 5gwei
 
 forge script script/Deploy.s.sol:Deploy --rpc-url bitgold_testnet \
   --private-key "$PRIVATE_KEY" --legacy --gas-price 5gwei --broadcast
@@ -144,12 +144,14 @@ Setting `gasPrice` makes ethers v6 build a legacy transaction; adding `type: 0` 
 
 ## Gas and fees
 
-The fee market is legacy, not EIP-1559. Verified on both chains on 2026-10-30:
+EIP-1559 is enabled but inert: the base fee is pinned at zero, so there is no burn and no dynamic fee market to reason about. Verified on both chains on 2026-10-30:
 
-- `eth_gasPrice` returns `0x12a05f200`, i.e. **5 gwei**, on mainnet and testnet.
-- `eth_maxPriorityFeePerGas` is accepted and echoes the same `0x12a05f200`. The method existing does not mean a 1559 market exists.
+- `eth_gasPrice` returns `0x12a05f200`, i.e. **5 gwei**, on mainnet and testnet. Treat 5 gwei as a reading, not a constant.
+- `eth_maxPriorityFeePerGas` is accepted and echoes the same `0x12a05f200`. The method existing does not mean a real 1559 market exists.
 - `baseFeePerGas` is `0x0` in the header of every block sampled.
 - `eth_feeHistory` over the last two blocks returns `baseFeePerGas: ["0x0", "0x0"]` and `reward: [["0x0", "0x0", "0x0"]]`. There is no base fee, so nothing is burned.
+
+The literals `5_000_000_000n` and `--gas-price 5gwei` in the snippets below are today's readings used as examples; read `eth_gasPrice` at send time instead of hardcoding them.
 
 Reproduce the fee-history check yourself:
 
@@ -171,7 +173,7 @@ What that means in practice:
 
 | Difference | Bitgold | What to do |
 | --- | --- | --- |
-| Fee market | No EIP-1559 base fee; `baseFeePerGas` always `0x0`; `eth_gasPrice` 5 gwei | Send type-0 transactions with explicit `gasPrice` |
+| Fee market | Base fee pinned at `0x0`; nothing burned; `eth_gasPrice` currently 5 gwei | Send type-0 transactions with an explicit `gasPrice` read at send time |
 | Block time | About 1 s | Never hardcode 12 s per block; one day is ~86,400 blocks |
 | Block gas limit | 7,000,000,000 | Never assume a 30M ceiling; still cap your own gas per transaction |
 | Chain IDs | 618 mainnet, 617 testnet | Set `chainId` explicitly and reject mismatches |
@@ -207,5 +209,5 @@ Repeat with `RPC=https://rpc.bitgold.network` and expect `618`. A balance of `0`
 - https://docs.bitgold.network/bitgold-network/developers/json_rpc/json-rpc-endpoint/
 - https://docs.bitgold.network/bitgold-network/overview/
 - https://docs.bitgold.network/bitgold-network/developers/wallet-configuration/
-- https://docs.bitgold.network/bitgold-next/overview/
-- https://docs.bitgold.network/bitgold-next/get-started/migrate-from-bitgold/
+
+The Bitgold Next pages (`/bitgold-next/overview/`, `/bitgold-next/get-started/migrate-from-bitgold/`) were consulted only to state that Bitgold Next is a separate devnet; nothing in them describes chain 618 or 617, so none of their values are used above.

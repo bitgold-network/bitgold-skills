@@ -53,6 +53,7 @@ const FORBIDDEN = [
   { label: 'Binance', pattern: /binance/i },
   { label: 'Greenfield', pattern: /greenfield/i },
   { label: 'ERC-8183', pattern: /erc-?8183/i },
+  { label: 'BEP-* proposal or token name', pattern: /\bbep[- ]?\d+/i },
   { label: 'B402', pattern: /\bb402\b/i },
   { label: 'Pieverse', pattern: /pieverse/i },
   { label: 'x402/MPP commerce stack', pattern: /\bx402\b|\bmpp\b/i },

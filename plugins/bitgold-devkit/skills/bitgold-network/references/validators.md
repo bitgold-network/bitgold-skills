@@ -13,10 +13,14 @@ authoritative where this summary differs from them.
 A validator produces blocks, votes in consensus, and earns fees plus delegator
 commission in BTG; participation is elected:
 
-- A daily election after `00:00 UTC` ranks stake: the top 45 are active, split
-  into 21 **Cabinets** (highest stake) and 24 **Candidates**.
-- Each epoch draws 18 Cabinets and 3 Candidates into a 21-validator consensus
-  set; both are slashed when offline on their turn.
+- A daily election after `00:00 UTC` ranks stake and refreshes the set.
+- The **designed** shape, as the docs describe it, is up to 45 active validators
+  split into **Cabinets** (highest stake) and **Candidates**, with each epoch
+  drawing a 21-validator consensus set from them (18 Cabinets + 3 Candidates);
+  both groups are slashed when offline on their turn. Treat 45 / 21 / 24 as the
+  protocol design and ceiling, **not** as the current headcount: the live mainnet
+  consensus set on 2026-10-30 held 6 validators. Always read the current set
+  before assuming a size.
 - Self-delegation is mandatory: 2000 BTG on chain, at least `2001` in the create
   form (2000 BTG plus 1 BTG locked to a dead address).
 - A **validator** is a registered record with keys and self-stake; a **candidate**
@@ -41,6 +45,11 @@ set is visible at <https://app.bitgold.network/staking/validators>, and
 | Stake | >2001 BTG in the operator account; >=2000 BTG self-delegated | same rules |
 | Keys | operator, consensus, BLS vote, BLS proof | same |
 | Network | P2P reachable (geth default 30303 TCP/UDP; the shipped `config.toml` may bind 30311 - open what your config binds); JSON-RPC 8545 not public | same |
+
+These are the documented **validator** host specifications, deliberately larger
+than the full-node minimums in [node-operations.md](./node-operations.md): a
+validator carries consensus traffic and must not fall behind, so size it as the
+docs say rather than as a plain full node.
 
 ## Lifecycle
 
@@ -152,8 +161,10 @@ before rotating keys on a live validator.
   shield the validator, can change IP, and keep proposals and votes flowing.
 - **Hide the validator.** Set `NoDiscovery = true` and list only sentries as
   static peers, then verify with `admin.peers`.
-- **Firewall.** Open the P2P listener (TCP) and discovery (UDP) ports, normally
-  30303; keep TCP 8545 (JSON-RPC) closed, or admin calls become reachable.
+- **Firewall.** Open the P2P listener (TCP) and discovery (UDP) ports your
+  `config.toml` actually binds - geth defaults to 30303, but the shipped
+  validator config listens on 30311 - and keep TCP 8545 (JSON-RPC) closed, or
+  admin calls become reachable.
 - **No keys on hot web servers.** Consensus and BLS keys stay on the validator
   host; the operator key belongs in a hardware, Safe, or MPC wallet.
 - **DDoS posture.** A public validator IP is fine only with the HTTP module
@@ -212,12 +223,24 @@ block-mining delays show whether your own blocks arrive on time.
 
 ## Monitoring and alerting
 
+The docs publish **two different downtime tables** on two different pages, so
+read both and treat on-chain contract state as the tie-breaker:
+
+- The validator overview page uses **50 missed blocks / 24 h** for reward loss
+  and **150 missed blocks / 24 h** for a downtime slash.
+- The slash-rules page uses **333 missed blocks / 24 h** (governable) for reward
+  loss and **1000 missed blocks / 24 h** (governable) for a 10 BTG slash plus a
+  2-day jail.
+
 Missing-block signals:
 
-- **Slashes.** More than three in a day warrants investigation; 50 moves the
-  validator into maintenance mode and then jail.
-- **Rewards.** More than 50 missed blocks in 24 hours forfeits the day's reward;
-  more than 150 in 24 hours is a downtime slash.
+- **Slashes.** More than three slash events in a day warrants investigation; the
+  slash indicator on the monitor page escalates at 50 (attention), 200 (slash)
+  and 600 (jail). These are contract-side indicator values, not a missed-block
+  count.
+- **Rewards.** Whichever threshold table applies, a validator that misses a
+  sustained run of blocks stops earning before it gets jailed - check the
+  contract before assuming the higher threshold protects you.
 - **Delay.** p95 `chain_delay_block_mining` or `chain_delay_block_send` rising
   while `chain_delay_block_insert` stays flat points at the local node.
 - **Logs.** Missing `Imported new chain segment` lines, or a stalled block
@@ -232,11 +255,13 @@ First three things to check: head and peers against
 after any `miner.stop()`; the unlock with `password.txt`, the BLS wallet with
 `blspassword.txt`, and the key matching the registration.
 
-After a penalty, exit maintenance mode and unjail once the jail ends:
+After the jail period, send the unjail transaction. Take the target address and
+the function signature from the deployed staking/slash ABI rather than a copied
+selector:
 
-```console
-geth attach geth.ipc
-web3.eth.sendTransaction({from: "0x...", to: "0x0000000000000000000000000000000000001000", data: "0x04c4fec6"})
+```bash
+cast send <slash-contract-address> "unjail()" \
+  --rpc-url https://rpc.bitgold.network --private-key "$PRIVATE_KEY"
 ```
 
 Jail lasts 30 days for double sign or malicious vote, and 2 days for downtime or

@@ -71,7 +71,7 @@ Rules that matter for this chain:
 | `eth_getBlockTransactionCountByNumber` | tag | `0x0` on an empty block |
 | `eth_getTransactionByHash` | hash | `null` for an unknown hash |
 | `eth_getTransactionReceipt` | hash | `status` `0x1` success, `0x0` revert |
-| `eth_getBlockReceipts` | tag or hash | Returns `null` on an empty block, not `[]` |
+| `eth_getBlockReceipts` | tag or hash | Array of receipts when the block has any; `null` for a block with no receipts (empty block, genesis, unknown height). Verified: block `0x1` returns 7 system-transaction receipts, `latest` returns `null` |
 | `eth_getUncleCountByBlockNumber` | tag | `0x0` |
 | `eth_getProof` | address, slots, tag | Supported (account + storage proofs) |
 
@@ -93,8 +93,9 @@ Rules that matter for this chain:
 | Method | Params | Notes |
 | --- | --- | --- |
 | `eth_getLogs` | filter object | **5,000-block maximum range** per call |
-| `eth_newFilter` / `eth_getFilterChanges` | filter object / filter id | Available, but polling `eth_getLogs` in 5,000-block windows is simpler and stateless |
-| `eth_uninstallFilter` | filter id | |
+| `eth_newFilter` | filter object (same shape as `eth_getLogs`) | Returns a filter id |
+| `eth_getFilterChanges` | filter id | New entries since the previous poll |
+| `eth_uninstallFilter` | filter id | Frees the server-side filter |
 
 ### Subscriptions (WebSocket only)
 
