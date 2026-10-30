@@ -1,0 +1,35 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env and secrets — never commit wallet material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+keystore/
+.bitgold/
+
+# Build output
+dist/
+build/
+out/
+cache/
+typechain-types/
+coverage/
+coverage.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local scratch
+tmp/
+.tmp/
+*.log

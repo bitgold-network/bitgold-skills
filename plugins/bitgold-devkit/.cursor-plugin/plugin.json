@@ -1,0 +1,23 @@
+{
+  "name": "bitgold-devkit",
+  "version": "1.0.0",
+  "description": "Network, RPC, wallet, contract development, node, staking, validator, governance, paymaster, and bridge skills for Bitgold Network.",
+  "author": {
+    "name": "Bitgold Network community"
+  },
+  "homepage": "https://github.com/bitgold-network/bitgold-skills",
+  "repository": "https://github.com/bitgold-network/bitgold-skills",
+  "license": "MIT",
+  "keywords": [
+    "bitgold",
+    "btg",
+    "evm",
+    "layer-1",
+    "json-rpc",
+    "hardhat",
+    "foundry",
+    "staking",
+    "validator"
+  ],
+  "skills": "./skills/"
+}

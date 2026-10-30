@@ -1,0 +1,20 @@
+{
+  "name": "bitgold-skills",
+  "interface": {
+    "displayName": "Bitgold Network Skills"
+  },
+  "plugins": [
+    {
+      "name": "bitgold-devkit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bitgold-devkit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

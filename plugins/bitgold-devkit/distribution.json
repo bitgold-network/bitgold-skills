@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "plugin": {
+    "name": "bitgold-devkit",
+    "version": "1.0.0"
+  },
+  "source": {
+    "repository": "https://github.com/bitgold-network/bitgold-skills",
+    "path": "skills/bitgold-network",
+    "mirror": "plugins/bitgold-devkit/skills/bitgold-network"
+  },
+  "payload": {
+    "root": "skills/bitgold-network",
+    "sha256": "304cee8a2167a062e9e59ae15b1d00455e5513b887ce35d330b2483cb7d1e2bc",
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "19f5d09b0ccbcb6e106f4a47bab9796f0df476a37331408dc81607929b208c7d"
+      },
+      {
+        "path": "references/account-abstraction-and-bridge.md",
+        "sha256": "56f4cac95ecad0177754d4ec63c872d7d503e4a2194ab83c7b86f6530a9fee3b"
+      },
+      {
+        "path": "references/evm-development.md",
+        "sha256": "53bbbf31cb01b5423133b4b71b2449f535078292a72a694850d7b3abf3f9ad8f"
+      },
+      {
+        "path": "references/governance.md",
+        "sha256": "9e8cc0a64150c2a9ceb24498204363dd9184a73cea29c8c01b33631952dbb4db"
+      },
+      {
+        "path": "references/json-rpc.md",
+        "sha256": "bf2cc779b57e70cbdd8376f8b3c379a9e2ba43ce7b86b05b04eef973aeec237f"
+      },
+      {
+        "path": "references/network-and-rpc.md",
+        "sha256": "58dc36e4e0b62556fa2a34706f6f1ed4d97105ee85181d5ef4eeef5882ab5007"
+      },
+      {
+        "path": "references/node-operations.md",
+        "sha256": "b7b91346c14a1ed1f27ce8174193eaf0720125692f7d77ee435f57cfb899b29c"
+      },
+      {
+        "path": "references/slashing-and-mev.md",
+        "sha256": "dfb73fe84d691d8851cac9406c9879b9686d9133fe28f03f781bdbb683f85c57"
+      },
+      {
+        "path": "references/staking-and-delegation.md",
+        "sha256": "dc9132731abbe0057e8c92c63ecf88ae5603971f1201cae24ba4c71eb162cc6c"
+      },
+      {
+        "path": "references/validators.md",
+        "sha256": "89d0e13968fa75fa6408ba994484f6d1fd5a918c6167a9f73d36570fbdc38801"
+      },
+      {
+        "path": "references/wallets-and-faucet.md",
+        "sha256": "5f0dbbc2b6b24d9807955fe03245aa896ed75750b31abedcd23ceb543d7c5cfe"
+      }
+    ]
+  },
+  "manifests": {
+    "claude": ".claude-plugin/plugin.json",
+    "cursor": ".cursor-plugin/plugin.json",
+    "codex": ".codex-plugin/plugin.json"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "bitgold-skills",
+  "description": "Agent skills and plugins for building on Bitgold Network",
+  "owner": {
+    "name": "Bitgold Network community"
+  },
+  "plugins": [
+    {
+      "name": "bitgold-devkit",
+      "description": "Network, RPC, wallet, contract development, node, staking, validator, governance, paymaster, and bridge skills for Bitgold Network.",
+      "version": "1.0.0",
+      "source": "./plugins/bitgold-devkit",
+      "category": "Developer Tools"
+    }
+  ],
+  "metadata": {
+    "description": "Agent skills and plugins for building on Bitgold Network"
+  }
+}
